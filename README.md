@@ -1,4 +1,5 @@
 # expense-tracker
+
 practice with nodejs cli
 
 https://roadmap.sh/projects/expense-tracker
@@ -8,6 +9,7 @@ https://roadmap.sh/projects/expense-tracker
 Application should run from the command line and should have the following features:
 
 Users can add an expense with a description and amount.
+
 - Users can update an expense.
 - Users can delete an expense.
 - Users can view all expenses.
@@ -19,7 +21,6 @@ Here are some additional features that you can add to the application:
 - Add expense categories and allow users to filter expenses by category.
 - Allow users to set a budget for each month and show a warning when the user exceeds the budget.
 - Allow users to export expenses to a CSV file.
-
 
 The list of commands and their expected output is shown below:
 
