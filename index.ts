@@ -1,5 +1,7 @@
 import { appendFile, access, writeFile, readFile } from "node:fs/promises";
 
+const DB_NAME = "db.csv";
+
 interface Expense {
   id: number;
   date: string;
@@ -10,23 +12,29 @@ interface Expense {
 const getCSVExpense = ({ id, date, description, amount }: Expense) =>
   `${id},${date},${description},${amount}\n`;
 
+async function getRows() {
+  await access(DB_NAME);
+  const csv = await readFile(DB_NAME, "utf8");
+  const csvArray = csv.split("\n").filter((line) => line.trim() !== "");
+  return csvArray.map((line) => line.split(","));
+}
+
 export async function addExpense(description: string, amount: number) {
   if (!description || !amount || amount <= 0) {
     console.log("description and amount must exist to continue");
     return;
   }
+
   const date = new Date().toISOString().split("T")[0];
 
   try {
-    await access("db.csv");
-    const csv = await readFile("db.csv", "utf8");
-    const csvArray = csv.split("\n").filter((line) => line.trim() !== "");
-    const lastExpense = csvArray.at(-1)!;
-    const lastExpenseId = Number(lastExpense.split(",")[0]);
+    const rows = await getRows();
+    const lastExpense = rows[rows.length - 1];
+    const lastExpenseId = Number(lastExpense[0]);
     const id = isNaN(lastExpenseId) ? 1 : lastExpenseId + 1;
     const newExpense = getCSVExpense({ id, date, description, amount });
 
-    await appendFile("db.csv", newExpense, "utf8");
+    await appendFile(DB_NAME, newExpense, "utf8");
     console.log(`Expense added successfully (ID: ${id})`);
   } catch (err) {
     const error = err as NodeJS.ErrnoException;
@@ -35,7 +43,7 @@ export async function addExpense(description: string, amount: number) {
       const csvHeader = "ID,Date,Description,Amount\n";
       const csvExpense = getCSVExpense({ id: 1, date, description, amount });
 
-      await writeFile("db.csv", `${csvHeader}${csvExpense}`, "utf8");
+      await writeFile(DB_NAME, `${csvHeader}${csvExpense}`, "utf8");
     }
 
     console.log("Expense not added, because: ", error);
@@ -49,13 +57,11 @@ export async function addExpense(description: string, amount: number) {
  * */
 export async function list() {
   try {
-    const csv = await readFile("db.csv", "utf8");
-    const csvArray = csv.split("\n").filter((line) => line.trim() !== "");
-    const cvsRows = csvArray.map((line) => line.split(","));
+    const rows = await getRows();
     const columnWidths: number[] = [];
 
     // set column widths
-    cvsRows.forEach((row) => {
+    rows.forEach((row) => {
       row.forEach((cell, cellIndex) => {
         columnWidths[cellIndex] = Math.max(
           columnWidths[cellIndex] ?? 0,
@@ -64,7 +70,7 @@ export async function list() {
       });
     });
 
-    const formattedRows = cvsRows.map((row, index) =>
+    const formattedRows = rows.map((row, index) =>
       row.reduce((acc, cell, cellIndex) => {
         const isAmountCell = cellIndex === row.length - 1;
         const basicPadding = isAmountCell ? 0 : 3;
@@ -93,16 +99,13 @@ export async function summary(month?: number) {
     return;
   }
 
-  let totalExpenses = 0;
-
   try {
-    const csv = await readFile("db.csv", "utf8");
-    const csvArray = csv.split("\n").filter((line) => line.trim() !== "");
-    const cvsRows = csvArray.map((line) => line.split(","));
-    const cvsRowsWithoutHeader = cvsRows.slice(1);
+    const rows = await getRows();
+    const rowsWithoutHeader = rows.slice(1);
+    let totalExpenses = 0;
 
     if (month) {
-      const expensesMonthRows = cvsRowsWithoutHeader.filter((row) => {
+      const expensesMonthRows = rowsWithoutHeader.filter((row) => {
         const expenseDate = new Date(row[1]);
         return expenseDate.getMonth() + 1 === month;
       });
@@ -120,7 +123,7 @@ export async function summary(month?: number) {
       return;
     }
 
-    cvsRowsWithoutHeader.forEach((row) => {
+    rowsWithoutHeader.forEach((row) => {
       const amount = Number(row.at(-1));
       totalExpenses += amount;
     });
@@ -136,16 +139,12 @@ export async function deleteExpense(id: number) {
     return;
   }
 
-  const stringId = id.toString();
-
   try {
-    const csv = await readFile("db.csv", "utf8");
-    const csvArray = csv.split("\n").filter((line) => line.trim() !== "");
-    const cvsRows = csvArray.map((line) => line.split(","));
+    const rows = await getRows();
+    const stringId = id.toString();
+    const filteredRows = rows.filter((row) => row[0] !== stringId);
 
-    const filteredRows = cvsRows.filter((row) => row[0] !== stringId);
-
-    if (filteredRows.length === cvsRows.length) {
+    if (filteredRows.length === rows.length) {
       console.log("Expense with this ID does not exist");
       return;
     }
@@ -153,7 +152,7 @@ export async function deleteExpense(id: number) {
     const updatedCsvContent =
       filteredRows.map((row) => row.join(",")).join("\n") + "\n";
 
-    await writeFile("db.csv", updatedCsvContent);
+    await writeFile(DB_NAME, updatedCsvContent, "utf8");
     console.log("Expense deleted successfully");
   } catch (err) {
     console.log("Can't delete expense, because: ", err);
