@@ -1,6 +1,49 @@
+import { Command } from "commander";
 import { appendFile, access, writeFile, readFile } from "node:fs/promises";
 
 const DB_NAME = "db.csv";
+
+const program = new Command();
+
+program.name("expense-tracker");
+
+program
+  .command("add")
+  .description("add a new expense")
+  .option("--description <string>", "description of the expense")
+  .option("--amount <number>", "amount of the expense")
+  .action(({ description, amount }) => {
+    if (amount) {
+      amount = Number(amount);
+    }
+    return addExpense(description, amount);
+  });
+
+program.command("list").description("show all expenses").action(list);
+
+program
+  .command("summary")
+  .description("show summary expenses")
+  .option("--month <number>", "Month of the expenses")
+  .action(({ month }) => {
+    if (month) {
+      month = Number(month);
+    }
+    return summary(month);
+  });
+
+program
+  .command("delete")
+  .description("Delete an expense")
+  .option("--id <number>", "ID of the expense")
+  .action(({ id }) => {
+    if (id) {
+      id = Number(id);
+    }
+    return deleteExpense(id);
+  });
+
+program.parse(process.argv);
 
 interface Expense {
   id: number;
@@ -41,9 +84,12 @@ export async function addExpense(description: string, amount: number) {
 
     if (error.code === "ENOENT") {
       const csvHeader = "ID,Date,Description,Amount\n";
-      const csvExpense = getCSVExpense({ id: 1, date, description, amount });
+      const id = 1;
+      const csvExpense = getCSVExpense({ id, date, description, amount });
 
       await writeFile(DB_NAME, `${csvHeader}${csvExpense}`, "utf8");
+      console.log(`Expense added successfully (ID: ${id})`);
+      return;
     }
 
     console.log("Expense not added, because: ", error);
