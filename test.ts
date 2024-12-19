@@ -1,5 +1,5 @@
 import { describe, it } from "node:test";
-import { addExpense, list } from "./index.js";
+import { addExpense, list, summary } from "./index.js";
 
 describe("index", () => {
   describe("addExpense", () => {
@@ -8,22 +8,21 @@ describe("index", () => {
       await addExpense("description 2", 200);
     });
   });
-  // $ expense-tracker add --description "Lunch" --amount 20
-  //     `Expense added successfully (ID: 1)`
-  //
-  // $ expense-tracker add --description "Dinner" --amount 10
-  //     `Expense added successfully (ID: 2)`
-  //
+
   describe("list", () => {
     it("should show expenses", async () => {
       await list();
     });
   });
-  // $ expense-tracker list
-  //     `ID  Date       Description  Amount`
-  //     `1   2024-08-06  Lunch        $20`
-  //     `2   2024-08-06  Dinner       $10`
-  //
+
+  describe("summary", () => {
+    it("should show total expenses", async () => {
+      await summary();
+      await summary(1);
+      await summary(13);
+      await summary(12);
+    });
+  });
   // $ expense-tracker summary
   //     `Total expenses: $30`
   //
