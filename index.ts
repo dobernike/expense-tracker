@@ -42,12 +42,46 @@ export async function addExpense(description: string, amount: number) {
   }
 }
 
-export function list() {}
-// $ expense-tracker list
-//     `ID  Date       Description  Amount`
-//     `1   2024-08-06  Lunch        $20`
-//     `2   2024-08-06  Dinner       $10`
-//
+/* return a list of expenses in the following format:
+ID    Date          Description      Amount
+1     2024-12-19    description      $100
+2     2024-12-19    description 2    $200
+ */
+export async function list() {
+  try {
+    const csv = await readFile("db.csv", "utf8");
+    const csvArray = csv.split("\n");
+    const cvsRows = csvArray.map((line) => line.split(","));
+    const columnWidths: number[] = [];
+
+    // set column widths
+    cvsRows.forEach((row) => {
+      row.forEach((cell, cellIndex) => {
+        columnWidths[cellIndex] = Math.max(
+          columnWidths[cellIndex] ?? 0,
+          cell.length,
+        );
+      });
+    });
+
+    const formattedRows = cvsRows.map((row, index) =>
+      row.reduce((acc, cell, cellIndex) => {
+        const isAmountCell = cellIndex === row.length - 1;
+        const basicPadding = isAmountCell ? 0 : 3;
+        const amountSign = isAmountCell && index !== 0 ? "$" : "";
+        const padding = " ".repeat(
+          columnWidths[cellIndex] + basicPadding - cell.length,
+        );
+
+        return `${acc}${amountSign}${cell}${padding} `;
+      }, ""),
+    );
+
+    formattedRows.forEach((row) => console.log(row));
+  } catch (err) {
+    console.log("Error reading file: ", err);
+  }
+}
 
 export function summary() {}
 // $ expense-tracker summary

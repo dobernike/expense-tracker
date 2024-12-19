@@ -1,6 +1,5 @@
-// import { assert } from "node:assert";
 import { describe, it } from "node:test";
-import { addExpense } from "./index.js";
+import { addExpense, list } from "./index.js";
 
 describe("index", () => {
   describe("addExpense", () => {
@@ -15,6 +14,11 @@ describe("index", () => {
   // $ expense-tracker add --description "Dinner" --amount 10
   //     `Expense added successfully (ID: 2)`
   //
+  describe("list", () => {
+    it("should show expenses", async () => {
+      await list();
+    });
+  });
   // $ expense-tracker list
   //     `ID  Date       Description  Amount`
   //     `1   2024-08-06  Lunch        $20`
