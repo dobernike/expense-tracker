@@ -11,8 +11,8 @@ const getCSVExpense = ({ id, date, description, amount }: Expense) =>
   `${id},${date},${description},${amount}\n`;
 
 export async function addExpense(description: string, amount: number) {
-  if (!description || !amount) {
-    console.error("description and amount must exist to continue");
+  if (!description || !amount || amount <= 0) {
+    console.log("description and amount must exist to continue");
     return;
   }
   const date = new Date().toISOString().split("T")[0];
@@ -38,7 +38,7 @@ export async function addExpense(description: string, amount: number) {
       await writeFile("db.csv", `${csvHeader}${csvExpense}`, "utf8");
     }
 
-    console.error("Expense not added, because: ", error);
+    console.log("Expense not added, because: ", error);
   }
 }
 
@@ -89,7 +89,7 @@ export async function list() {
  * */
 export async function summary(month?: number) {
   if (month && (month < 1 || month > 12)) {
-    console.error("Month must be between 1 and 12");
+    console.log("Month must be between 1 and 12");
     return;
   }
 
@@ -132,7 +132,7 @@ export async function summary(month?: number) {
 
 export async function deleteExpense(id: number) {
   if (!id || id < 1) {
-    console.error("ID must be greater than 0");
+    console.log("ID must be greater than 0");
     return;
   }
 
@@ -146,7 +146,7 @@ export async function deleteExpense(id: number) {
     const filteredRows = cvsRows.filter((row) => row[0] !== stringId);
 
     if (filteredRows.length === cvsRows.length) {
-      console.error("Expense with this ID does not exist");
+      console.log("Expense with this ID does not exist");
       return;
     }
 
@@ -156,6 +156,6 @@ export async function deleteExpense(id: number) {
     await writeFile("db.csv", updatedCsvContent);
     console.log("Expense deleted successfully");
   } catch (err) {
-    console.error("Can't delete expense, because: ", err);
+    console.log("Can't delete expense, because: ", err);
   }
 }
