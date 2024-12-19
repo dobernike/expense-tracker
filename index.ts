@@ -21,9 +21,9 @@ export async function addExpense(description: string, amount: number) {
     await access("db.csv");
     const csv = await readFile("db.csv", "utf8");
     const csvArray = csv.split("\n").filter((line) => line.trim() !== "");
-    const lastExpense = csvArray[csvArray.length - 2];
-    const lastExpenseId = lastExpense.split(",")[0];
-    const id = parseInt(lastExpenseId) + 1;
+    const lastExpense = csvArray.at(-1)!;
+    const lastExpenseId = Number(lastExpense.split(",")[0]);
+    const id = isNaN(lastExpenseId) ? 1 : lastExpenseId + 1;
     const newExpense = getCSVExpense({ id, date, description, amount });
 
     await appendFile("db.csv", newExpense, "utf8");
@@ -38,7 +38,7 @@ export async function addExpense(description: string, amount: number) {
       await writeFile("db.csv", `${csvHeader}${csvExpense}`, "utf8");
     }
 
-    console.error("Error expense not added, because: ", error);
+    console.error("Expense not added, because: ", error);
   }
 }
 
@@ -79,7 +79,7 @@ export async function list() {
 
     formattedRows.forEach((row) => console.log(row));
   } catch (err) {
-    console.log("Error reading file: ", err);
+    console.log("Can't show list of expenses, because: ", err);
   }
 }
 
@@ -101,21 +101,32 @@ export async function summary(month?: number) {
     const cvsRows = csvArray.map((line) => line.split(","));
     const cvsRowsWithoutHeader = cvsRows.slice(1);
 
-    let expensesRows = cvsRowsWithoutHeader;
     if (month) {
-      expensesRows = cvsRowsWithoutHeader.filter((row) => {
+      const expensesMonthRows = cvsRowsWithoutHeader.filter((row) => {
         const expenseDate = new Date(row[1]);
         return expenseDate.getMonth() + 1 === month;
       });
+
+      expensesMonthRows.forEach((row) => {
+        const amount = Number(row.at(-1));
+        totalExpenses += amount;
+      });
+
+      const monthName = new Intl.DateTimeFormat("en", {
+        month: "long",
+      }).format(new Date(2024, month - 1));
+
+      console.log(`Total expenses for ${monthName}: $${totalExpenses}`);
+      return;
     }
 
-    expensesRows.forEach((row) => {
+    cvsRowsWithoutHeader.forEach((row) => {
       const amount = Number(row.at(-1));
       totalExpenses += amount;
     });
     console.log(`Total expenses: $${totalExpenses}`);
   } catch (err) {
-    console.log("Error reading file: ", err);
+    console.log("Can't show summary of expenses, because: ", err);
   }
 }
 
@@ -139,12 +150,12 @@ export async function deleteExpense(id: number) {
       return;
     }
 
-    await writeFile(
-      "db.csv",
-      filteredRows.map((row) => row.join(",")).join("\n"),
-    );
+    const updatedCsvContent =
+      filteredRows.map((row) => row.join(",")).join("\n") + "\n";
+
+    await writeFile("db.csv", updatedCsvContent);
     console.log("Expense deleted successfully");
   } catch (err) {
-    console.error("Error with deleting expense: ", err);
+    console.error("Can't delete expense, because: ", err);
   }
 }
