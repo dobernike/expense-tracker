@@ -1,5 +1,5 @@
 import { describe, it } from "node:test";
-import { addExpense, list, summary } from "./index.js";
+import { addExpense, list, summary, deleteExpense } from "./index.js";
 
 describe("index", () => {
   describe("addExpense", () => {
@@ -23,15 +23,13 @@ describe("index", () => {
       await summary(12);
     });
   });
-  // $ expense-tracker summary
-  //     `Total expenses: $30`
-  //
-  // $ expense-tracker delete --id 2
-  //     `Expense deleted successfully`
-  //
-  // $ expense-tracker summary
-  //     `Total expenses: $20`
-  //
-  // $ expense-tracker summary --month 8
-  //     `Total expenses for August: $20`
+
+  describe("deleteExpense", () => {
+    it("should delete expense with set id", async () => {
+      await deleteExpense(0);
+      await deleteExpense(1);
+      await deleteExpense(2);
+      await deleteExpense(10);
+    });
+  });
 });

@@ -42,7 +42,7 @@ export async function addExpense(description: string, amount: number) {
   }
 }
 
-/* return a list of expenses in the following format:
+/* log a list of expenses in the following format:
  * ID    Date          Description      Amount
  * 1     2024-12-19    description      $100
  * 2     2024-12-19    description 2    $200
@@ -83,7 +83,7 @@ export async function list() {
   }
 }
 
-/* return the total expenses in the following format:
+/* log the total expenses in the following format:
  * `Total expenses: $30`
  * `Total expenses for August: $20`
  * */
@@ -118,16 +118,33 @@ export async function summary(month?: number) {
     console.log("Error reading file: ", err);
   }
 }
-// $ expense-tracker summary
-//     `Total expenses: $30`
-//
-// $ expense-tracker summary
-//     `Total expenses: $20`
-//
-// $ expense-tracker summary --month 8
-//     `Total expenses for August: $20`
 
-export function deleteExpense() {}
-// $ expense-tracker delete --id 2
-//     `Expense deleted successfully`
-//
+export async function deleteExpense(id: number) {
+  if (!id || id < 1) {
+    console.error("ID must be greater than 0");
+    return;
+  }
+
+  const stringId = id.toString();
+
+  try {
+    const csv = await readFile("db.csv", "utf8");
+    const csvArray = csv.split("\n").filter((line) => line.trim() !== "");
+    const cvsRows = csvArray.map((line) => line.split(","));
+
+    const filteredRows = cvsRows.filter((row) => row[0] !== stringId);
+
+    if (filteredRows.length === cvsRows.length) {
+      console.error("Expense with this ID does not exist");
+      return;
+    }
+
+    await writeFile(
+      "db.csv",
+      filteredRows.map((row) => row.join(",")).join("\n"),
+    );
+    console.log("Expense deleted successfully");
+  } catch (err) {
+    console.error("Error with deleting expense: ", err);
+  }
+}
