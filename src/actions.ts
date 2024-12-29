@@ -1,49 +1,6 @@
-import { Command } from "commander";
 import { appendFile, access, writeFile, readFile } from "node:fs/promises";
 
 const DB_NAME = "db.csv";
-
-const program = new Command();
-
-program.name("expense-tracker");
-
-program
-  .command("add")
-  .description("add a new expense")
-  .option("--description <string>", "description of the expense")
-  .option("--amount <number>", "amount of the expense")
-  .action(({ description, amount }) => {
-    if (amount) {
-      amount = Number(amount);
-    }
-    return addExpense(description, amount);
-  });
-
-program.command("list").description("show all expenses").action(list);
-
-program
-  .command("summary")
-  .description("show summary expenses")
-  .option("--month <number>", "Month of the expenses")
-  .action(({ month }) => {
-    if (month) {
-      month = Number(month);
-    }
-    return summary(month);
-  });
-
-program
-  .command("delete")
-  .description("Delete an expense")
-  .option("--id <number>", "ID of the expense")
-  .action(({ id }) => {
-    if (id) {
-      id = Number(id);
-    }
-    return deleteExpense(id);
-  });
-
-program.parse(process.argv);
 
 interface Expense {
   id: number;
@@ -111,7 +68,7 @@ export async function list() {
       row.forEach((cell, cellIndex) => {
         columnWidths[cellIndex] = Math.max(
           columnWidths[cellIndex] ?? 0,
-          cell.length,
+          cell.length
         );
       });
     });
@@ -122,11 +79,11 @@ export async function list() {
         const basicPadding = isAmountCell ? 0 : 3;
         const amountSign = isAmountCell && index !== 0 ? "$" : "";
         const padding = " ".repeat(
-          columnWidths[cellIndex] + basicPadding - cell.length,
+          columnWidths[cellIndex] + basicPadding - cell.length
         );
 
         return `${acc}${amountSign}${cell}${padding} `;
-      }, ""),
+      }, "")
     );
 
     formattedRows.forEach((row) => console.log(row));

@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { after, before, beforeEach, describe, it } from "node:test";
-import { addExpense, list, summary, deleteExpense } from "./index.js";
+import { addExpense, list, summary, deleteExpense } from "./actions.ts";
 
 describe("index", () => {
   let consoleOutput: string[] = [];
@@ -34,8 +34,8 @@ describe("index", () => {
 
       assert(
         consoleOutput.every((output) =>
-          output.includes("description and amount must exist to continue"),
-        ),
+          output.includes("description and amount must exist to continue")
+        )
       );
     });
   });
@@ -53,28 +53,28 @@ describe("index", () => {
     it("should show total expenses", async () => {
       await summary();
       assert(
-        consoleOutput.some((output) => output.includes("Total expenses: $")),
+        consoleOutput.some((output) => output.includes("Total expenses: $"))
       );
 
       await summary(1);
       assert(
         consoleOutput.some((output) =>
-          output.includes("Total expenses for January: $"),
-        ),
+          output.includes("Total expenses for January: $")
+        )
       );
 
       await summary(13);
       assert(
         consoleOutput.some((output) =>
-          output.includes("Month must be between 1 and 12"),
-        ),
+          output.includes("Month must be between 1 and 12")
+        )
       );
 
       await summary(12);
       assert(
         consoleOutput.some((output) =>
-          output.includes("Total expenses for December: $"),
-        ),
+          output.includes("Total expenses for December: $")
+        )
       );
     });
   });
@@ -84,29 +84,29 @@ describe("index", () => {
       await deleteExpense(0);
       assert(
         consoleOutput.some((output) =>
-          output.includes("ID must be greater than 0"),
-        ),
+          output.includes("ID must be greater than 0")
+        )
       );
 
       await deleteExpense(1);
       assert(
         consoleOutput.some((output) =>
-          output.includes("Expense deleted successfully"),
-        ),
+          output.includes("Expense deleted successfully")
+        )
       );
 
       await deleteExpense(2);
       assert(
         consoleOutput.some((output) =>
-          output.includes("Expense deleted successfully"),
-        ),
+          output.includes("Expense deleted successfully")
+        )
       );
 
       await deleteExpense(10);
       assert(
         consoleOutput.some((output) =>
-          output.includes("Expense with this ID does not exist"),
-        ),
+          output.includes("Expense with this ID does not exist")
+        )
       );
     });
   });
