@@ -1,6 +1,8 @@
 import { appendFile, access, writeFile, readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 const DB_NAME = process.env.DB_NAME ?? "db.csv";
+const DB_PATH = join(import.meta.dirname, "../../", DB_NAME);
 
 interface Expense {
   id: number;
@@ -13,8 +15,8 @@ const getCSVExpense = ({ id, date, description, amount }: Expense) =>
   `${id},${date},${description},${amount}\n`;
 
 async function getRows() {
-  await access(DB_NAME);
-  const csv = await readFile(DB_NAME, "utf8");
+  await access(DB_PATH);
+  const csv = await readFile(DB_PATH, "utf8");
   const csvArray = csv.split("\n").filter((line) => line.trim() !== "");
   return csvArray.map((line) => line.split(","));
 }
@@ -52,7 +54,7 @@ export async function addExpense(
     const id = isNaN(lastExpenseId) ? 1 : lastExpenseId + 1;
     const newExpense = getCSVExpense({ id, date, description, amount });
 
-    await appendFile(DB_NAME, newExpense, "utf8");
+    await appendFile(DB_PATH, newExpense, "utf8");
     console.log(`Expense added successfully (ID: ${id})`);
   } catch (err) {
     const error = err as NodeJS.ErrnoException;
@@ -62,7 +64,7 @@ export async function addExpense(
       const id = 1;
       const csvExpense = getCSVExpense({ id, date, description, amount });
 
-      await writeFile(DB_NAME, `${csvHeader}${csvExpense}`, "utf8");
+      await writeFile(DB_PATH, `${csvHeader}${csvExpense}`, "utf8");
       console.log(`Expense added successfully (ID: ${id})`);
       return;
     }
@@ -179,7 +181,7 @@ export async function deleteExpense(id: number) {
     const updatedCsvContent =
       filteredRows.map((row) => row.join(",")).join("\n") + "\n";
 
-    await writeFile(DB_NAME, updatedCsvContent, "utf8");
+    await writeFile(DB_PATH, updatedCsvContent, "utf8");
     console.log("Expense deleted successfully");
   } catch (err) {
     console.log("Can't delete expense, because: ", err);
