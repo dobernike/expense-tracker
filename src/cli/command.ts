@@ -1,5 +1,10 @@
 import { Command } from "commander";
-import { addExpense, list, summary, deleteExpense } from "./actions.ts";
+import {
+  addExpense,
+  list,
+  summary,
+  deleteExpense,
+} from "../actions/actions.ts";
 
 const program = new Command();
 
@@ -8,8 +13,8 @@ program.name("expense-tracker");
 program
   .command("add")
   .description("add a new expense")
-  .option("--description <string>", "description of the expense")
-  .option("--amount <number>", "amount of the expense")
+  .option("-d --description <string>", "description of the expense")
+  .option("-a --amount <number>", "amount of the expense")
   .action(({ description, amount }) => {
     if (amount) {
       amount = Number(amount);
@@ -22,7 +27,7 @@ program.command("list").description("show all expenses").action(list);
 program
   .command("summary")
   .description("show summary expenses")
-  .option("--month <number>", "Month of the expenses")
+  .option("-m --month <number>", "Month of the expenses")
   .action(({ month }) => {
     if (month) {
       month = Number(month);
@@ -33,7 +38,7 @@ program
 program
   .command("delete")
   .description("Delete an expense")
-  .option("--id <number>", "ID of the expense")
+  .option("-i --id <number>", "ID of the expense")
   .action(({ id }) => {
     if (id) {
       id = Number(id);
@@ -41,9 +46,4 @@ program
     return deleteExpense(id);
   });
 
-// Show help if no command is provided
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
-}
-
-program.parse(process.argv);
+export { program };

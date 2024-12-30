@@ -1,12 +1,15 @@
 {
   "name": "expense-tracker",
+  "bin": {
+    "etrack": "src/cli/bin.ts"
+  },
   "version": "1.0.0",
   "description": "practice with nodejs cli",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
     "start": "node --watch --no-warnings --experimental-strip-types src/index.ts",
-    "cli": "node --no-warnings --experimental-strip-types src/cli.ts",
+    "cli-link": "(npm unlink etrack || true) && npm link",
     "format": "prettier --write src/**/*.ts",
     "lint": "eslint --flag unstable_ts_config src/**/*.ts",
     "lint:fix": "eslint --flag unstable_ts_config src/**/*.ts --fix",

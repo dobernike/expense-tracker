@@ -1,16 +1,24 @@
 # expense-tracker
 
+# cli
+
+- clone the repo
+- install Node.js v22+
+- run `npm cli-link`
+
+after that, the cli will be add globally, and could be run as `etrack` from terminal
+
 ## The list of commands and their expected output is shown below:
 
-$ npm start -- add --description "Lunch" --amount 20
+$ etrack add --description "Lunch" --amount 20
 
 `Expense added successfully (ID: 1)`
 
-$ npm start -- add --description "Dinner" --amount 10
+$ etrack add --description "Dinner" --amount 10
 
 `Expense added successfully (ID: 2)`
 
-$ npm start -- list
+$ etrack list
 
 `ID  Date       Description  Amount`
 
@@ -18,23 +26,17 @@ $ npm start -- list
 
 `2   2024-08-06  Dinner       $10`
 
-$ npm start -- summary
+$ etrack summary
 
 `Total expenses: $30`
 
-$ npm start -- summary --month 8
+$ etrack summary --month 8
 
 `Total expenses for August: $20`
 
-$ npm start -- delete --id 2
+$ etrack delete --id 2
 
 `Expense deleted successfully`
-
-# For what
-
-practice with nodejs cli
-
-https://roadmap.sh/projects/expense-tracker
 
 # Requirements
 
