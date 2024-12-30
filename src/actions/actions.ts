@@ -1,6 +1,6 @@
 import { appendFile, access, writeFile, readFile } from "node:fs/promises";
 
-const DB_NAME = "db.csv";
+const DB_NAME = process.env.DB_NAME ?? "db.csv";
 
 interface Expense {
   id: number;
@@ -19,13 +19,31 @@ async function getRows() {
   return csvArray.map((line) => line.split(","));
 }
 
-export async function addExpense(description: string, amount: number) {
+export async function addExpense(
+  description: string,
+  amount: number,
+  date?: string
+) {
   if (!description || !amount || amount <= 0) {
     console.log("description and amount must exist to continue");
     return;
   }
 
-  const date = new Date().toISOString().split("T")[0];
+  if (!date) {
+    date = new Date().toISOString().split("T")[0];
+  } else {
+    if (!date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      console.log("Date must be in the format YYYY-MM-DD");
+      return;
+    }
+
+    try {
+      date = new Date(date).toISOString().split("T")[0];
+    } catch {
+      console.error("Invalid date");
+      return;
+    }
+  }
 
   try {
     const rows = await getRows();

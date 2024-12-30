@@ -13,8 +13,8 @@
     "format": "prettier --write src/**/*.ts",
     "lint": "eslint --flag unstable_ts_config src/**/*.ts",
     "lint:fix": "eslint --flag unstable_ts_config src/**/*.ts --fix",
-    "test": "node --test --no-warnings --experimental-strip-types '**/*.test.ts'",
-    "posttest": "rm -f db.csv"
+    "test": "node --test --env-file=.env.test --no-warnings --experimental-strip-types '**/*.test.ts'",
+    "posttest": "rm -f test-db.csv"
   },
   "keywords": [],
   "author": "",

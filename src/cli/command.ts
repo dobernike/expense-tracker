@@ -15,11 +15,12 @@ program
   .description("add a new expense")
   .option("-d --description <string>", "description of the expense")
   .option("-a --amount <number>", "amount of the expense")
-  .action(({ description, amount }) => {
+  .option("--date <>", "date of the expense")
+  .action(({ description, amount, date }) => {
     if (amount) {
       amount = Number(amount);
     }
-    return addExpense(description, amount);
+    return addExpense(description, amount, date);
   });
 
 program.command("list").description("show all expenses").action(list);

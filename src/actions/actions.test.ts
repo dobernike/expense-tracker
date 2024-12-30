@@ -21,16 +21,21 @@ describe("index", () => {
       consoleOutput = [];
     });
 
-    it("should added expense", async () => {
+    it("should add expense", async () => {
       await addExpense("description", 100);
       await addExpense("description 2", 200);
-      originalLog(consoleOutput);
 
+      assert(consoleOutput.some((output) => output.includes("Expense added")));
+    });
+
+    it("should add expense with provided date", async () => {
+      await addExpense("description 2", 200, "2024-12-29");
       assert(consoleOutput.some((output) => output.includes("Expense added")));
     });
 
     it("should not add expense with invalid amount", async () => {
       await addExpense("description", 0);
+      await addExpense("description", -1);
 
       assert(
         consoleOutput.every((output) =>
@@ -38,12 +43,20 @@ describe("index", () => {
         )
       );
     });
+
+    it("should not add expense with invalid date", async () => {
+      await addExpense("description 2", 200, "2024-12-291");
+      await addExpense("description 2", 200, "test");
+      await addExpense("description 2", 200, "1");
+      await addExpense("description 2", 200, "");
+
+      assert(consoleOutput.some((output) => output.includes("Expense added")));
+    });
   });
 
   describe("list", () => {
     it("should show expenses", async () => {
       await list();
-      // originalLog(consoleOutput);
 
       assert(consoleOutput.some((output) => output.includes("ID")));
     });
