@@ -153,7 +153,7 @@ export async function summary(month?: number) {
     }
 
     console.log(
-      `Total expenses ${!month ? "" : `for ${monthName}`}: $${totalExpenses.toFixed(2)}`
+      `Total expenses${!month ? "" : ` for ${monthName}`}: $${totalExpenses.toFixed(2)}`
     );
   } catch (err) {
     console.log("Can't show summary of expenses, because: ", err);
