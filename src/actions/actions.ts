@@ -91,7 +91,14 @@ export async function list() {
       });
     });
 
-    const formattedRows = rows.map((row, index) =>
+    // sort rows by date
+    const header = rows[0];
+    const dataRows = rows
+      .slice(1)
+      .sort((a, b) => new Date(a[1]).getTime() - new Date(b[1]).getTime());
+    const sortedRows = [header, ...dataRows];
+
+    const formattedRows = sortedRows.map((row, index) =>
       row.reduce((acc, cell, cellIndex) => {
         const isAmountCell = cellIndex === row.length - 1;
         const basicPadding = isAmountCell ? 0 : 3;
