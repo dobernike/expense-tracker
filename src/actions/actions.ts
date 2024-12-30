@@ -123,32 +123,31 @@ export async function summary(month?: number) {
   try {
     const rows = await getRows();
     const rowsWithoutHeader = rows.slice(1);
+
+    const filteredRows = month
+      ? rowsWithoutHeader.filter((row) => {
+          const expenseDate = new Date(row[1]);
+          return expenseDate.getMonth() + 1 === month;
+        })
+      : rowsWithoutHeader;
+
     let totalExpenses = 0;
-
-    if (month) {
-      const expensesMonthRows = rowsWithoutHeader.filter((row) => {
-        const expenseDate = new Date(row[1]);
-        return expenseDate.getMonth() + 1 === month;
-      });
-
-      expensesMonthRows.forEach((row) => {
-        const amount = Number(row.at(-1));
-        totalExpenses += amount;
-      });
-
-      const monthName = new Intl.DateTimeFormat("en", {
-        month: "long",
-      }).format(new Date(2024, month - 1));
-
-      console.log(`Total expenses for ${monthName}: $${totalExpenses}`);
-      return;
-    }
-
-    rowsWithoutHeader.forEach((row) => {
+    filteredRows.forEach((row) => {
       const amount = Number(row.at(-1));
       totalExpenses += amount;
     });
-    console.log(`Total expenses: $${totalExpenses}`);
+
+    let monthName = "";
+    if (month) {
+      const currentYear = new Date().getFullYear();
+      monthName = new Intl.DateTimeFormat("en", {
+        month: "long",
+      }).format(new Date(currentYear, month - 1));
+    }
+
+    console.log(
+      `Total expenses ${!month ? "" : `for ${monthName}`}: $${totalExpenses.toFixed(2)}`
+    );
   } catch (err) {
     console.log("Can't show summary of expenses, because: ", err);
   }
