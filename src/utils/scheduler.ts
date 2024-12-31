@@ -1,5 +1,5 @@
 // The Scheduler class is a utility class that can be used to schedule a task to run at a specific interval. It prevents cases where the local environment could be inactive and the task would not run.
-class Scheduler {
+export class Scheduler {
   intervalId?: NodeJS.Timeout;
   lastRunTime?: Date;
 
@@ -22,6 +22,7 @@ class Scheduler {
 
   public unschedule(): void {
     clearInterval(this.intervalId);
+    this.lastRunTime = undefined;
   }
 
   private shouldRunTask(): boolean {

@@ -1,1 +1,1 @@
-export * from "./scheduler.ts";
+export { scheduler } from "./scheduler.ts";

@@ -13,7 +13,7 @@
     "format": "prettier --write src/**/*.ts",
     "lint": "eslint --flag unstable_ts_config src/**/*.ts",
     "lint:fix": "eslint --flag unstable_ts_config src/**/*.ts --fix",
-    "test": "node --test --env-file=.env.test --no-warnings --experimental-strip-types '**/*.test.ts'",
+    "test": "npx vitest run scheduler.test.ts && node --test --env-file=.env.test --no-warnings --experimental-strip-types '**/*.spec.ts'",
     "posttest": "rm -f test-db.csv"
   },
   "keywords": [],
@@ -26,7 +26,8 @@
     "jiti": "^2.4.2",
     "prettier": "^3.4.2",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.18.1"
+    "typescript-eslint": "^8.18.1",
+    "vitest": "^2.1.8"
   },
   "dependencies": {
     "commander": "^12.1.0",
