@@ -1,10 +1,5 @@
 import { Command } from "commander";
-import {
-  addExpense,
-  list,
-  summary,
-  deleteExpense,
-} from "../actions/actions.ts";
+import { addExpense, list, summary, deleteExpense } from "../actions";
 
 const program = new Command();
 

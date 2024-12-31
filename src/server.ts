@@ -2,7 +2,8 @@ import http from "node:http";
 import url from "node:url";
 import { google } from "googleapis";
 import credentials from "../credentials.json" with { type: "json" };
-import { addExpense } from "./actions/actions.ts";
+import { addExpense } from "./actions";
+import { scheduler } from "./utils";
 
 const PORT = 3000;
 const EXPENSE_SYNCED_LABEL = "EXPENSE_SYNCED";
@@ -46,8 +47,14 @@ const server = http.createServer((req, res) => {
       auth.setCredentials(tokens);
       res.writeHead(200, { "content-type": "text/plain" });
       res.end("Sync expense is running");
-      readEmails();
+
+      scheduler.schedule(readEmails);
     });
+  }
+  if (parsedUrl.pathname === "/stop_sync") {
+    scheduler.unschedule();
+    res.writeHead(200, { "content-type": "text/plain" });
+    res.end("Sync expense is stopped");
   } else {
     res.writeHead(404, { "content-type": "text/plain" });
     res.end("Not found");
@@ -86,11 +93,6 @@ async function readEmails() {
     userId: "me",
     maxResults: 10,
     q: `from:automated@airbnb.com subject:"${AIRBNB_SUBJECT_FIRST_PART}" is:unread -label:${EXPENSE_SYNCED_LABEL}`,
-
-    // q: `from:express@airbnb.com OR from:automated@airbnb.com subject:"Reservation confirmed" OR subject:"Your receipt from Airbnb" is:unread -label:${EXTENSE_SYNCED_LABEL}`,
-
-    // -label:${EXTENSE_SYNCED_LABEL}`,
-    // q: 'from:test@test.com subject:"Test With Test" is:unread',
   });
 
   const messages = response.data.messages;
@@ -132,7 +134,7 @@ async function readEmails() {
 
       await addExpense(description, Number(amountPaid), checkinDate);
       console.log(
-        `added expense for ${description} on ${checkinDate} with amount ${amountPaid}`
+        `Added expense for ${description} on ${checkinDate} with amount ${amountPaid}`
       );
 
       // Mark the message as synced
@@ -143,15 +145,10 @@ async function readEmails() {
           addLabelIds: [syncLabelId],
         },
       });
-      console.log(
-        `Message with ID: ${message.id} marked as ${EXPENSE_SYNCED_LABEL}`
-      );
+      console.log(`Message: ${message.id} marked as ${EXPENSE_SYNCED_LABEL}`);
     }
 
-    setTimeout(() => {
-      console.log("Searching emails for sync expense");
-      readEmails();
-    }, 86400000); // 24 hours
+    console.log("Searching emails for sync expense");
   }
 }
 
