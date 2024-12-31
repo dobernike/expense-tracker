@@ -34,8 +34,9 @@ export async function addExpense(
   if (!date) {
     date = new Date().toISOString().split("T")[0];
   } else {
-    if (!date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      console.log("Date must be in the format YYYY-MM-DD");
+    // YYYY-MM-DD or YYYY-MM-DDTHH:MM
+    if (!date.match(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/)) {
+      console.log("Date must be in the format YYYY-MM-DD or YYYY-MM-DDTHH:MM");
       return;
     }
 

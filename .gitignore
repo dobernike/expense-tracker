@@ -134,3 +134,6 @@ dist
 # db
 db.csv
 test-db.csv
+
+# credentials
+credentials.json
