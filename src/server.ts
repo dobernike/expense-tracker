@@ -90,6 +90,7 @@ async function createLabel(): Promise<string> {
 
 async function readEmails() {
   console.log("Searching emails for sync expense");
+
   const response = await gmail.users.messages.list({
     userId: "me",
     maxResults: 100,
@@ -148,8 +149,6 @@ async function readEmails() {
       });
       console.log(`Message: ${message.id} marked as ${EXPENSE_SYNCED_LABEL}`);
     }
-
-    console.log("Searching emails for sync expense");
   }
 }
 
