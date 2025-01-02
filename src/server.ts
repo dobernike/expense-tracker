@@ -33,6 +33,7 @@ const server = http.createServer((req, res) => {
   } else if (parsedUrl.pathname === "/google-callback") {
     const code = query.code as string;
     if (!code) {
+      console.error("Missing code parameter");
       res.writeHead(400, { "content-type": "text/plain" });
       res.end("Missing code parameter");
       return;
@@ -45,6 +46,7 @@ const server = http.createServer((req, res) => {
         return;
       }
       auth.setCredentials(tokens);
+      readEmails();
       scheduler.schedule(readEmails);
       res.writeHead(200, { "content-type": "text/plain" });
       res.end("Sync expense is running");
@@ -87,9 +89,10 @@ async function createLabel(): Promise<string> {
 }
 
 async function readEmails() {
+  console.log("Searching emails for sync expense");
   const response = await gmail.users.messages.list({
     userId: "me",
-    maxResults: 10,
+    maxResults: 100,
     q: `from:automated@airbnb.com subject:"${AIRBNB_SUBJECT_FIRST_PART}" is:unread -label:${EXPENSE_SYNCED_LABEL}`,
   });
 
