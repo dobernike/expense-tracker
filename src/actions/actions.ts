@@ -2,7 +2,7 @@ import { appendFile, access, writeFile, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const DB_NAME = process.env.DB_NAME ?? "db.csv";
-const DB_PATH = join(import.meta.dirname, "../../", DB_NAME);
+const DB_PATH = join(import.meta.dirname, "../db/", DB_NAME);
 
 interface Expense {
   id: number;

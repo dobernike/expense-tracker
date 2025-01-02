@@ -137,3 +137,4 @@ test-db.csv
 
 # credentials
 credentials.json
+tokens.json
