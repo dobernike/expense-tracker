@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { addExpense, list, summary, deleteExpense } from "../actions";
+import { addExpense, list, summary, deleteExpense } from "../actions/index.ts";
 
 const program = new Command();
 

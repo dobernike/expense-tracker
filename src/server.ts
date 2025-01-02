@@ -2,8 +2,8 @@ import http from "node:http";
 import url from "node:url";
 import { google } from "googleapis";
 import credentials from "../credentials.json" with { type: "json" };
-import { addExpense } from "./actions";
-import { scheduler } from "./utils";
+import { addExpense } from "./actions/index.ts";
+import { scheduler } from "./utils/index.ts";
 
 const PORT = 3000;
 const EXPENSE_SYNCED_LABEL = "EXPENSE_SYNCED";
