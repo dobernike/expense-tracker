@@ -45,13 +45,11 @@ const server = http.createServer((req, res) => {
         return;
       }
       auth.setCredentials(tokens);
+      scheduler.schedule(readEmails);
       res.writeHead(200, { "content-type": "text/plain" });
       res.end("Sync expense is running");
-
-      scheduler.schedule(readEmails);
     });
-  }
-  if (parsedUrl.pathname === "/stop_sync") {
+  } else if (parsedUrl.pathname === "/stop_sync") {
     scheduler.unschedule();
     res.writeHead(200, { "content-type": "text/plain" });
     res.end("Sync expense is stopped");
