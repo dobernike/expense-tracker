@@ -4,8 +4,6 @@ import { join } from "node:path";
 const DB_NAME = process.env.DB_NAME ?? "db.csv";
 const DB_PATH = join(import.meta.dirname, "..", "..", "db", DB_NAME);
 
-console.log("DB_PATH", DB_PATH, "dirname", import.meta.dirname);
-
 interface Expense {
   id: number;
   date: string;

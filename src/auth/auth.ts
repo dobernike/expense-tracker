@@ -39,6 +39,7 @@ const getAccessToken = async () => {
       throw new Error("No refresh token is set.");
     }
 
+    auth.setCredentials({ refresh_token: token.refresh_token });
     const newToken = (await auth.refreshAccessToken()).credentials;
     await fs.writeFile(TOKENS_PATH, JSON.stringify(newToken));
     console.log("Access token refreshed successfully");
@@ -51,8 +52,9 @@ const getAccessToken = async () => {
 export async function authorize(code?: string) {
   let token;
   if (code) {
-    const { tokens } = await auth.getToken(code);
-    await fs.writeFile(TOKENS_PATH, JSON.stringify(tokens));
+    const authToken = await auth.getToken(code);
+    token = authToken.tokens;
+    await fs.writeFile(TOKENS_PATH, JSON.stringify(token));
     console.log("Token saved successfully!");
   } else {
     token = await getAccessToken();
