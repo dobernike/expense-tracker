@@ -15,7 +15,7 @@
     "lint": "eslint --flag unstable_ts_config src/**/*.ts",
     "lint:fix": "eslint --flag unstable_ts_config src/**/*.ts --fix",
     "test": "npx vitest run scheduler.test.ts && node --test --env-file=.env.test --no-warnings --experimental-strip-types '**/*.spec.ts'",
-    "posttest": "rm -f src/db/test-db.csv"
+    "posttest": "rm -f db/test-db.csv"
   },
   "keywords": [],
   "author": "",

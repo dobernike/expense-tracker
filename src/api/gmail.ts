@@ -102,5 +102,7 @@ export async function syncEmailsWithExpenses() {
 
       markMessageAsSynced(id as string, syncLabelId);
     }
+  } else {
+    console.log("No emails found for sync expense");
   }
 }

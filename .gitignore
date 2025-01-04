@@ -131,8 +131,7 @@ dist
 
 .idea
 
-# db
-db.csv
+# test
 test-db.csv
 
 # credentials

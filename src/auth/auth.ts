@@ -17,40 +17,47 @@ const scopes = [
 ];
 
 export const generateAuthUrl = () =>
-  auth.generateAuthUrl({ access_type: "offline", scope: scopes });
+  auth.generateAuthUrl({
+    access_type: "offline",
+    scope: scopes,
+    prompt: "consent",
+  });
 
 import fs from "fs/promises";
 
-const saveTokens = async (tokens) => {
+const getAccessToken = async () => {
   try {
-    await fs.writeFile(TOKENS_PATH, JSON.stringify(tokens, null, 2), "utf-8");
-    console.log("Tokens saved successfully!");
-  } catch (err) {
-    console.log("Error saving tokens:", err.message);
-  }
-};
+    const token = JSON.parse(await fs.readFile(TOKENS_PATH, "utf-8"));
 
-const readTokens = async () => {
-  try {
-    const data = await fs.readFile(TOKENS_PATH, "utf-8");
-    return JSON.parse(data);
-  } catch (err) {
-    console.log("Error reading tokens:", err.message);
-    return null;
+    const currentTime = new Date().getTime();
+    if (token.expiry_date && token.expiry_date > currentTime) {
+      console.log("Access token is still valid");
+      return token;
+    }
+
+    if (!token.refresh_token) {
+      throw new Error("No refresh token is set.");
+    }
+
+    const newToken = (await auth.refreshAccessToken()).credentials;
+    await fs.writeFile(TOKENS_PATH, JSON.stringify(newToken));
+    console.log("Access token refreshed successfully");
+    return newToken;
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
   }
 };
 
 export async function authorize(code?: string) {
-  let tokens;
+  let token;
   if (code) {
-    const authToken = await auth.getToken(code);
-    tokens = authToken.tokens;
-
-    await saveTokens(tokens);
+    const { tokens } = await auth.getToken(code);
+    await fs.writeFile(TOKENS_PATH, JSON.stringify(tokens));
+    console.log("Token saved successfully!");
   } else {
-    tokens = await readTokens();
-    if (!tokens) throw new Error("No saved tokens found!");
+    token = await getAccessToken();
+    if (!token) throw new Error("No saved token found!");
   }
 
-  auth.setCredentials(tokens);
+  auth.setCredentials(token);
 }
