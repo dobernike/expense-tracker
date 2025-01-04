@@ -84,6 +84,5 @@ start service - `npm start` and follow the console command
 
 - Install docker
 - `docker build -t expense-tracker .`
-- `docker run -d --restart unless-stopped -p 3000:3000 -v ~/db/db.csv:/app/db/db.csv expense-tracker`
-- `docker run -d --restart unless-stopped -p 3000 -v $(pwd)/db/db.csv:/app/db/db.csv expense-tracker`
+- `docker run -d --restart unless-stopped -p 3000:3000 -v $(pwd)/db/db.csv:/app/db/db.csv expense-tracker`
 - `open localhost:3000 and sign-in into google account`
