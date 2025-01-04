@@ -58,7 +58,7 @@ Here are some additional features that you can add to the application:
 
 # sync with GMAIL
 
-Service for read messages from your gmail, search mail to find airbnb confirm mail and add info to postgres DB. For get information about expense and rented dates
+Service for read messages from your gmail, search mail to find airbnb confirm mail and add info to `db.csv`. For get information about expense and rented dates
 
 ## prerequest
 
