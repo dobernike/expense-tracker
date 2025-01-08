@@ -80,9 +80,18 @@ service will connect to your gmail by OAuth and read messages from sender `AirBn
 
 start service - `npm start` and follow the console command
 
-# Docker
+# Docker (manual)
 
 - Install docker
 - `docker build -t expense-tracker .`
 - `docker run -d --restart unless-stopped -p 3000:3000 -v $(pwd)/db/db.csv:/app/db/db.csv expense-tracker`
 - `open localhost:3000 and sign-in into google account`
+
+# Docker compose (with postgres DB)
+
+- Install docker
+- `docker-compose up -d`
+
+if you need to check db inside docker, use:
+
+- `docker exec -it expense-tracker-db-1 psql -U user -d expenses`

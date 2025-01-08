@@ -1,15 +1,15 @@
 import { appendFile, access, writeFile, readFile } from "node:fs/promises";
 import { join } from "node:path";
+import {
+  addExpenseDB,
+  deleteExpenseDB,
+  getListDB,
+  getSummary,
+} from "../../db/db.ts";
+import type { Expense } from "../../db/types.ts";
 
 const DB_NAME = process.env.DB_NAME ?? "db.csv";
 const DB_PATH = join(import.meta.dirname, "..", "..", "db", DB_NAME);
-
-interface Expense {
-  id: number;
-  date: string;
-  description: string;
-  amount: number;
-}
 
 const getCSVExpense = ({ id, date, description, amount }: Expense) =>
   `${id},${date},${description},${amount}\n`;
@@ -24,7 +24,7 @@ async function getRows() {
 export async function addExpense(
   description: string,
   amount: number,
-  date?: string
+  date?: string,
 ) {
   if (!description || !amount || amount <= 0) {
     console.log("description and amount must exist to continue");
@@ -46,6 +46,12 @@ export async function addExpense(
       console.error("Invalid date");
       return;
     }
+  }
+
+  const isExpenseAdded = await addExpenseDB({ date, description, amount });
+  if (isExpenseAdded) {
+    console.log(`Expense added successfully`);
+    return;
   }
 
   try {
@@ -80,6 +86,53 @@ export async function addExpense(
  * 2     2024-12-19    description 2    $200
  * */
 export async function list() {
+  const expenses = await getListDB();
+
+  if (expenses) {
+    const columnWidths: number[] = [];
+    const header = {
+      id: "ID",
+      date: "Date",
+      description: "Description",
+      amount: "Amount",
+    } as unknown as Expense;
+
+    expenses.unshift(header);
+
+    // set column widths
+    expenses.forEach((row) => {
+      columnWidths[0] = Math.max(columnWidths[0] ?? 0, String(row.id).length);
+      columnWidths[1] = Math.max(columnWidths[1] ?? 0, String(row.date).length);
+      columnWidths[2] = Math.max(
+        columnWidths[2] ?? 0,
+        String(row.description).length,
+      );
+      columnWidths[3] = Math.max(
+        columnWidths[3] ?? 0,
+        String(row.amount).length,
+      );
+    });
+
+    expenses.forEach((expense, index) => {
+      const isHeader = index === 0;
+      const basicPadding = 3;
+
+      /*
+      ID    Date          Description              Amount
+      1     2024-12-02    Argentina car tickets    $837
+      */
+      console.log(
+        String(expense.id).padEnd(columnWidths[0] + basicPadding),
+        expense.date.padEnd(columnWidths[1] + basicPadding),
+        expense.description.padEnd(columnWidths[2] + basicPadding),
+        (!isHeader ? "$" : "") +
+          String(expense.amount).padEnd(columnWidths[3] + basicPadding),
+      );
+    });
+
+    return;
+  }
+
   try {
     const rows = await getRows();
     const columnWidths: number[] = [];
@@ -89,7 +142,7 @@ export async function list() {
       row.forEach((cell, cellIndex) => {
         columnWidths[cellIndex] = Math.max(
           columnWidths[cellIndex] ?? 0,
-          cell.length
+          cell.length,
         );
       });
     });
@@ -107,11 +160,11 @@ export async function list() {
         const basicPadding = isAmountCell ? 0 : 3;
         const amountSign = isAmountCell && index !== 0 ? "$" : "";
         const padding = " ".repeat(
-          columnWidths[cellIndex] + basicPadding - cell.length
+          columnWidths[cellIndex] + basicPadding - cell.length,
         );
 
         return `${acc}${amountSign}${cell}${padding} `;
-      }, "")
+      }, ""),
     );
 
     formattedRows.forEach((row) => console.log(row));
@@ -127,6 +180,24 @@ export async function list() {
 export async function summary(month?: number) {
   if (month && (month < 1 || month > 12)) {
     console.log("Month must be between 1 and 12");
+    return;
+  }
+
+  const totalAmount = await getSummary(month);
+  console.log("total", totalAmount);
+
+  if (totalAmount) {
+    let monthName = "";
+    if (month) {
+      const currentYear = new Date().getFullYear();
+      monthName = new Intl.DateTimeFormat("en", {
+        month: "long",
+      }).format(new Date(currentYear, month - 1));
+    }
+
+    console.log(
+      `Total expenses${!month ? "" : ` for ${monthName}`}: $${totalAmount}`,
+    );
     return;
   }
 
@@ -156,7 +227,7 @@ export async function summary(month?: number) {
     }
 
     console.log(
-      `Total expenses${!month ? "" : ` for ${monthName}`}: $${totalExpenses.toFixed(2)}`
+      `Total expenses${!month ? "" : ` for ${monthName}`}: $${totalExpenses.toFixed(2)}`,
     );
   } catch (err) {
     console.log("Can't show summary of expenses, because: ", err);
@@ -166,6 +237,12 @@ export async function summary(month?: number) {
 export async function deleteExpense(id: number) {
   if (!id || id < 1) {
     console.log("ID must be greater than 0");
+    return;
+  }
+
+  const isExpenseDeleted = await deleteExpenseDB(id);
+  if (isExpenseDeleted) {
+    console.log("Expense deleted successfully");
     return;
   }
 
