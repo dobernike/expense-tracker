@@ -28,7 +28,7 @@ export async function addExpenseDB({
     client.connect();
     const result = await client.query(
       `INSERT INTO ${TRANSACTION_TABLE} (date, description, amount) VALUES($1, $2, $3)`,
-      [date, description, amount]
+      [date, description, amount],
     );
     client.end();
 
@@ -44,7 +44,7 @@ export async function getListDB(): Promise<Expense[]> {
     const result = await client.query<rawExpense>(
       `SELECT id, date, description, amount
        FROM ${TRANSACTION_TABLE}
-       ORDER BY date;`
+       ORDER BY date;`,
     );
     client.end();
 
@@ -86,12 +86,54 @@ export async function deleteExpenseDB(id: number) {
     const result = await client.query(
       `DELETE FROM ${TRANSACTION_TABLE}
        WHERE id = $1`,
-      [id]
+      [id],
     );
     client.end();
 
     return result.rowCount;
   } else {
     console.log("Using CSV instead of database");
+  }
+}
+
+export async function updateExpenseDB(expense: Expense) {
+  if (!expense.id) {
+    throw new Error("ID is required");
+  }
+
+  if (client) {
+    const fields: string[] = [];
+    const values: any[] = [];
+    let query = `UPDATE transactions SET`;
+
+    if (expense.date) {
+      fields.push(`date = $${fields.length + 1}`);
+      values.push(expense.date);
+    }
+
+    if (expense.description) {
+      fields.push(`description = $${fields.length + 1}`);
+      values.push(expense.description);
+    }
+
+    if (expense.amount) {
+      fields.push(`amount = $${fields.length + 1}`);
+      values.push(expense.amount);
+    }
+
+    if (!fields.length) {
+      throw new Error("At least one field to update must be provided");
+    }
+
+    query += ` ${fields.join(", ")} WHERE id = $${fields.length + 1}`;
+    values.push(expense.id);
+
+    await client.connect();
+    const result = await client.query(query, values);
+    client.end();
+
+    return result.rowCount;
+  } else {
+    console.log("Database is not available");
   }
 }

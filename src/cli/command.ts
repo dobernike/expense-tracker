@@ -1,5 +1,11 @@
 import { Command } from "commander";
-import { addExpense, list, summary, deleteExpense } from "../actions/index.ts";
+import {
+  addExpense,
+  list,
+  summary,
+  deleteExpense,
+  updateExpense,
+} from "../actions/index.ts";
 
 const program = new Command();
 
@@ -16,6 +22,20 @@ program
       amount = Number(amount);
     }
     return addExpense(description, amount, date);
+  });
+
+program
+  .command("update")
+  .description("update expense with id")
+  .option("-i --id <number>", "ID of the expense")
+  .option("-d --description <>", "description of the expense")
+  .option("-a --amount <>", "amount of the expense")
+  .option("--date <>", "date of the expense")
+  .action(({ description, amount, date, id }) => {
+    if (amount) {
+      amount = Number(amount);
+    }
+    return updateExpense({ description, amount, date, id });
   });
 
 program.command("list").description("show all expenses").action(list);

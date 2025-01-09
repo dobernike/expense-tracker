@@ -38,9 +38,9 @@ $ etrack delete --id 2
 
 `Expense deleted successfully`
 
-# Requirements
+# Description of CLI
 
-Application should run from the command line and should have the following features:
+Application run from the command line and have the following features:
 
 Users can add an expense with a description and amount.
 
@@ -48,9 +48,11 @@ Users can add an expense with a description and amount.
 - Users can delete an expense.
 - Users can view all expenses.
 - Users can view a summary of all expenses.
-- Users can view a summary of expenses for a specific month (of current year).
+- Users can view a summary of expenses for a specific month (of current year). Now w/o year option
 
-Here are some additional features that you can add to the application:
+# additional requirements
+
+Here are some additional features that could be add to the aplication:
 
 - Add expense categories and allow users to filter expenses by category.
 - Allow users to set a budget for each month and show a warning when the user exceeds the budget.
