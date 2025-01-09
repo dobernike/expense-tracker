@@ -3,7 +3,7 @@
 # cli
 
 - clone the repo
-- install Node.js v22+
+- install Node.js v23.6+
 - run `npm link`
 
 After that, the CLI will be added globally, and can be run as `etrack` from the terminal.

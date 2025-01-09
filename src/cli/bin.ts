@@ -1,4 +1,4 @@
-#!/usr/bin/env node --no-warnings --experimental-strip-types
+#!/usr/bin/env node
 import { program } from "./command.ts";
 
 program.parse(process.argv);

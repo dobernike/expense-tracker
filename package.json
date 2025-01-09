@@ -8,13 +8,13 @@
   "main": "src/server.ts",
   "type": "module",
   "scripts": {
-    "start": "node --no-warnings --experimental-strip-types src/server.ts",
-    "dev": "node --watch --no-warnings --experimental-strip-types src/server.ts",
+    "start": "node src/server.ts",
+    "dev": "node --watch src/server.ts",
     "cli-link": "(npm unlink etrack || true) && npm link",
     "format": "prettier --write src/**/*.ts",
     "lint": "eslint --flag unstable_ts_config src/**/*.ts",
     "lint:fix": "eslint --flag unstable_ts_config src/**/*.ts --fix",
-    "test": "npx vitest run scheduler.test.ts && node --test --env-file=.env.test --no-warnings --experimental-strip-types '**/*.spec.ts'",
+    "test": "npx vitest run scheduler.test.ts && node --test --env-file=.env.test '**/*.spec.ts'",
     "posttest": "rm -f db/test-db.csv"
   },
   "keywords": [],
