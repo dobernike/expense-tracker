@@ -1,3 +1,6 @@
+import { join } from "node:path";
+import { writeFile } from "node:fs/promises";
+
 import {
   addExpenseDB,
   deleteExpenseDB,
@@ -12,6 +15,13 @@ import {
   listCSV,
   summaryCSV,
 } from "../csv/csv.ts";
+
+const EXPENSE_HEADER = {
+  id: "ID",
+  date: "Date",
+  description: "Description",
+  amount: "Amount",
+} as unknown as Expense;
 
 export async function addExpense(
   description: string,
@@ -59,14 +69,8 @@ export async function list() {
 
   if (expenses) {
     const columnWidths: number[] = [];
-    const header = {
-      id: "ID",
-      date: "Date",
-      description: "Description",
-      amount: "Amount",
-    } as unknown as Expense;
 
-    expenses.unshift(header);
+    expenses.unshift(EXPENSE_HEADER);
 
     // set column widths
     expenses.forEach((row) => {
@@ -164,4 +168,29 @@ export async function updateExpense(expense: Expense) {
   }
 
   console.log("Expense not found and not updated");
+}
+
+export async function downloadExpenses() {
+  const expenses = await getListDB();
+
+  if (expenses) {
+    const expensesWithHeader = [EXPENSE_HEADER, ...expenses];
+    const csv = expensesWithHeader
+      .map(
+        ({ id, date, description, amount }) =>
+          `${id},${date},${description},${amount}`,
+      )
+      .join("\n");
+
+    try {
+      const name = "expenses.csv";
+      const path = join(import.meta.dirname, "..", "..", name);
+
+      await writeFile(path, csv, "utf8");
+    } catch (err) {
+      console.log("Error writing expenses to file", err);
+    }
+  }
+
+  console.log("No expenses to download from DB");
 }

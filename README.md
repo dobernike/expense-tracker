@@ -49,6 +49,7 @@ Users can add an expense with a description and amount.
 - Users can view all expenses.
 - Users can view a summary of all expenses.
 - Users can view a summary of expenses for a specific month (of current year). Now w/o year option
+- Users can export/download expenses as CSV file.
 
 # additional requirements
 
@@ -56,7 +57,6 @@ Here are some additional features that could be add to the aplication:
 
 - Add expense categories and allow users to filter expenses by category.
 - Allow users to set a budget for each month and show a warning when the user exceeds the budget.
-- Allow users to export expenses to a CSV file.
 
 # sync with GMAIL
 
@@ -65,7 +65,7 @@ Service for read messages from your gmail, search mail to find airbnb confirm ma
 ## prerequest
 
 - clone the repo
-- download node.js 22+
+- download node.js v23.6+
 - install all dependencies by put the code in console - `npm install`
 - Create credentials in Google Cloud Console:
   - Go to the Google Cloud Console and create a project.

@@ -5,11 +5,19 @@ import {
   summary,
   deleteExpense,
   updateExpense,
+  downloadExpenses,
 } from "../actions/index.ts";
 
 const program = new Command();
 
 program.name("expense-tracker");
+
+program
+  .command("download")
+  .description("download expenses")
+  .action(() => {
+    downloadExpenses();
+  });
 
 program
   .command("add")
