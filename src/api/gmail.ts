@@ -24,7 +24,7 @@ async function createLabel(): Promise<string> {
       console.log("Label already exists.");
       const existingLabels = await gmail.users.labels.list({ userId: "me" });
       const label = existingLabels.data.labels?.find(
-        (label) => label.name === EXPENSE_SYNCED_LABEL
+        (label) => label.name === EXPENSE_SYNCED_LABEL,
       )!;
       return label.id as string;
     } else {
@@ -73,7 +73,7 @@ export async function syncEmailsWithExpenses() {
       if (!message.data.payload?.headers) continue;
 
       const subject = message.data.payload.headers.find(
-        (header) => header.name === "Subject"
+        (header) => header.name === "Subject",
       );
 
       if (!subject || !subject.value) continue;
@@ -82,25 +82,38 @@ export async function syncEmailsWithExpenses() {
       const decodedString = atob(
         (message.data.payload?.parts?.[1].body?.data ?? "")
           .replace(/-/g, "+")
-          .replace(/_/g, "/")
+          .replace(/_/g, "/"),
       );
 
       const checkinDate = decodedString.match(/"checkinDate":"([^"]+)"/)?.[1];
       // const checkoutDate = decodedString.match(/"checkoutDate":"([^"]+)"/)?.[1];
-      const amountPaid = decodedString.match(
-        /Amount paid \(USD\).*?\$([\d.]+)/
-      )?.[1];
+
+      let totalPaid = decodedString
+        .match(/Total \(USD\).*?>\$(\d{1,3}(?:,\d{3})*\.\d{2})<\/h3>/)?.[1]
+        .replace(/,/g, "");
+
+      const amountPaid = decodedString
+        .match(/Amount paid \(USD\).*?\$([\d.]+)/)?.[1]
+        .replace(/,/g, "");
+
+      const amount = totalPaid ?? amountPaid;
+
       const description = subject.value.replace(
         AIRBNB_SUBJECT_FIRST_PART,
-        "rent"
+        "rent",
       );
 
-      await addExpense(description, Number(amountPaid), checkinDate);
-      console.log(
-        `Added expense for ${description} on ${checkinDate} with amount ${amountPaid}`
-      );
+      try {
+        console.log(
+          `Trying to add expense for ${description} on ${checkinDate} with amount ${Number(amount)}`,
+        );
+        await addExpense(description, Number(amount), checkinDate);
+        console.log(`Added expense`);
 
-      markMessageAsSynced(id as string, syncLabelId);
+        markMessageAsSynced(id as string, syncLabelId);
+      } catch (err) {
+        console.error("Error adding expense:", err);
+      }
     }
   } else {
     console.log("No emails found for sync expense");

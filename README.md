@@ -92,7 +92,7 @@ start service - `npm start` and follow the console command
 # Docker compose (with postgres DB)
 
 - Install docker
-- `docker-compose up -d`
+- `docker compose up --force-recreate --build -d`
 
 if you need to check db inside docker, use:
 

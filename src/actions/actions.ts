@@ -29,8 +29,7 @@ export async function addExpense(
   date?: string,
 ) {
   if (!description || !amount || amount <= 0) {
-    console.log("description and amount must exist to continue");
-    return;
+    throw new Error("description and amount must exist to continue");
   }
 
   if (!date) {

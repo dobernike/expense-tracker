@@ -8,7 +8,7 @@ const TOKENS_PATH = join(import.meta.dirname, TOKENS_NAME);
 export const auth = new google.auth.OAuth2(
   credentials.web.client_id,
   credentials.web.client_secret,
-  credentials.web.redirect_uris[0]
+  credentials.web.redirect_uris[0],
 );
 
 const scopes = [
@@ -45,7 +45,14 @@ const getAccessToken = async () => {
     console.log("Access token refreshed successfully");
     return newToken;
   } catch (error) {
-    console.error("Error refreshing access token:", error);
+    if (error?.response?.data?.error === "invalid_grant") {
+      console.log("Refresh token is invalid or expired. Re-authenticating...");
+      const authUrl = generateAuthUrl();
+      // After user re-authenticates, will get a new refresh token
+      console.log("Authorize this app by visiting this url:", authUrl);
+    } else {
+      console.error("Error refreshing access token:", error);
+    }
   }
 };
 
