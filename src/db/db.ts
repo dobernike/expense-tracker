@@ -3,10 +3,9 @@ import type { rawExpense, Expense } from "./types.ts";
 
 const TRANSACTION_TABLE = "transactions";
 
-// load environment variables
+// provide a default database connection for CLI
 if (process.env.NODE_ENV !== "test") {
-  const { config } = await import("dotenv");
-  config();
+  process.env.DATABASE_URL = "postgres://user:123@localhost:5432/expenses";
 }
 
 const client = process.env.DATABASE_URL
