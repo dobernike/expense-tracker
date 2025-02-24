@@ -7,10 +7,14 @@ python version - https://github.com/dobernike/expense-tracker/tree/python
 # cli
 
 - clone the repo
-- install Node.js v23.6+
-- run `npm run cli-link`
+- install python3 and pipx
+- open in root project folder
+- run in terminal - `echo "DB_EXPENSE_TRACKER=$(realpath db/db.csv)" > .env`
+- and - `pipx install .`
 
-After that, the CLI will be added globally, and can be run as `etrack` from the terminal.
+
+After that, the CLI will be added globally, and can be run as `etrack` from the fish terminal.
+Also it will add CLI tool sync with GMAIL - check header `sync with GMAIL`
 
 ## The list of commands and their expected output is shown below:
 
@@ -42,7 +46,7 @@ $ etrack delete --id 2
 
 `Expense deleted successfully`
 
-# Description of CLI
+## Description of CLI
 
 Application run from the command line and have the following features:
 
@@ -55,7 +59,7 @@ Users can add an expense with a description and amount.
 - Users can view a summary of expenses for a specific month (of current year). Now w/o year option
 - Users can export/download expenses as CSV file.
 
-# additional requirements
+## additional requirements
 
 Here are some additional features that could be add to the aplication:
 
@@ -69,35 +73,25 @@ Service for read messages from your gmail, search mail to find airbnb confirm ma
 ## prerequest
 
 - clone the repo
-- download node.js v23.6+
-- install all dependencies by put the code in console - `npm install`
 - Create credentials in Google Cloud Console:
   - Go to the Google Cloud Console and create a project.
   - Navigate to "API & Services" > "Dashboard" > "Enable APIs and Services".
   - Search for "Gmail API" and enable it.
   - Create credentials (OAuth client ID), and download the JSON file.
+  - Rename it to credentials.json and put it in the current directory of the project.
   - Add permissions for `gmail.readonly`, and `gmail.modify`
-- Change `.env` based on your downloaded JSON data
 
 For now:
 service will connect to your gmail by OAuth and read messages from sender `AirBnB` to get information about confirmation (dates, city, price)
 
 ## how to use it:
 
-start service - `npm start` and follow the console command
+- For sync with GMAIL manually run `gmailsync` everytime when you want to check new expenses from gmail
 
-# Docker (manual)
+### Automatic sync
 
-- Install docker
-- `docker build -t expense-tracker .`
-- `docker run -d --restart unless-stopped -p 3000:3000 -v $(pwd)/db/db.csv:/app/db/db.csv expense-tracker`
-- `open localhost:3000 and sign-in into google account`
-
-# Docker compose (with postgres DB)
-
-- Install docker
-- `docker compose up --force-recreate --build -d`
-
-if you need to check db inside docker, use:
-
-- `docker exec -it expense-tracker-db-1 psql -U user -d expenses`
+For macOS, it could be done with `launchctl`:
+in root folder, run follow commands:
+  - `cp com.etrack.gmailsync.plist ~/Library/LaunchAgents/`
+  - `launchctl load ~/Library/LaunchAgents/com.etrack.gmailsync.plist`
+It will start automatically every day at 22:00 PM
