@@ -1,5 +1,8 @@
 # expense-tracker
 
+nodejs version - https://github.com/dobernike/expense-tracker/tree/nodejs
+python version - https://github.com/dobernike/expense-tracker/tree/python
+
 # cli
 
 - clone the repo
