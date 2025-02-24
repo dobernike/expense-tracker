@@ -73,7 +73,7 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
-# .env
+.env
 .env.development.local
 .env.test.local
 .env.production.local
@@ -129,16 +129,18 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# python
+build/
+.pytest_cache/
+*.egg-info/
+__pycache__/
+
 .idea
 .DS_Store
 .zed
 
-# test
-test-db.csv
-
 # credentials
 credentials.json
 tokens.json
-
-# downloads
+token.pickle
 expenses.csv
